@@ -12,6 +12,7 @@ namespace HabitLogger
         static DBController()
         {
             InitializeDB();
+            SeedData();
         }
 
         private static void InitializeDB()
@@ -166,8 +167,32 @@ namespace HabitLogger
             var sum=result.ExecuteScalar();
             connection.Close();
 
-            Console.WriteLine($"You've drank {(sum == DBNull.Value ? "no" : sum)  } water last week in the unit you've choosen");
+            Console.WriteLine($"You've drank {(sum == DBNull.Value ? "no" : sum)  } units of water last week in the unit you've choosen");
         }
+
+        public static void SeedData()
+        {
+            Random random = new Random();
+            int DataEntries = 100;
+            DateTime startDate = new DateTime(2024, 1, 1);
+            DateTime endDate = DateTime.Now;
+            using var connection = new SQLiteConnection(connectionString);
+            SQLiteCommand query = new("INSERT INTO drinking_water(Date,Quantity) VALUES (@date, @quantity)",connection);
+            connection.Open();
+            for (int i = 0; i < DataEntries; i++)
+            {
+                int range = (endDate - startDate).Days;
+                DateTime randomDate = startDate.AddDays(random.Next(range));
+
+                string formattedDate = randomDate.ToString("dd-MM-yy");
+                int quantity=random.Next(100);
+                query.Parameters.AddWithValue("@date",formattedDate);
+                query.Parameters.AddWithValue("@quantity",quantity);
+                query.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+
 
     }
 }
