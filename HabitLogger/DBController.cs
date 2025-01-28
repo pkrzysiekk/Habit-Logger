@@ -138,5 +138,36 @@ namespace HabitLogger
 
         }
 
+        public static void SumWater()
+        {
+            Console.Clear();
+
+            using var connection = new SQLiteConnection(connectionString);
+            connection.Open();
+            SQLiteCommand result = new("SELECT SUM(Quantity) FROM drinking_water",connection);
+            var sum= result.ExecuteScalar();
+            connection.Close();
+
+            Console.WriteLine($"You've drunk {sum} of water in the unit you've choosen ");
+
+        }
+
+        public static void LastWeekData()
+        {
+            Console.Clear( );
+            using var connection = new SQLiteConnection( connectionString);
+            DateTime currentDate = DateTime.Now;
+            DateTime weekAgo = currentDate.AddDays(-7);
+            connection.Open();
+            SQLiteCommand result = new("SELECT SUM(Quantity) FROM drinking_water WHERE date BETWEEN @weekAgo AND @currentDate", connection);
+
+            result.Parameters.AddWithValue("@currentDate", currentDate.ToString("dd-MM-yy"));
+            result.Parameters.AddWithValue("@weekAgo", weekAgo.ToString("dd-MM-yy"));
+            var sum=result.ExecuteScalar();
+            connection.Close();
+
+            Console.WriteLine($"You've drank {(sum == DBNull.Value ? "no" : sum)  } water last week in the unit you've choosen");
+        }
+
     }
 }
