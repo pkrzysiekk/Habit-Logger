@@ -1,5 +1,4 @@
-﻿using System.Data.SQLite;
-using System.Globalization;
+﻿
 
 namespace HabitLogger
 {
